@@ -13,6 +13,17 @@ class Task(models.Model):
 
     _order = "start_time asc"
 
+    def _get_selection_status(self):
+        return [
+            ("draft","Unconfirmed"),
+            ("open","Confirmed"),
+            ("done","Attended"),
+            ("absent_2","Absent - 2 compensations"),
+            ("absent_1","Absent - 1 compensation"),
+            ("absent_0","Absent - 0 compensation"),
+            ("cancel","Cancelled")
+        ]
+
     name = fields.Char(track_visibility='always')
     task_template_id = fields.Many2one('beesdoo.shift.template')
     planning_id = fields.Many2one(related='task_template_id.planning_id', store=True)
@@ -25,15 +36,7 @@ class Task(models.Model):
                                 ])
     start_time = fields.Datetime(track_visibility='always', index=True, required=True)
     end_time = fields.Datetime(track_visibility='always', required=True)
-    state = fields.Selection(selection=[
-            ("draft","Unconfirmed"),
-            ("open","Confirmed"),
-            ("done","Attended"),
-            ("absent_2","Absent - 2 compensations"),
-            ("absent_1","Absent - 1 compensation"),
-            ("absent_0","Absent - 0 compensation"),
-            ("cancel","Cancelled")
-    ],
+    state = fields.Selection(selection=_get_selection_status,
         default="open",
         required=True,
         store=True,

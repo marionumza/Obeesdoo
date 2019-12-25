@@ -2,7 +2,7 @@
     <record model="ir.ui.view" id="super_coop_partner_inherited_view_form">
         <field name="name">Partner Super Coop</field>
         <field name="model">res.partner</field>
-        <field name="inherit_id" ref="beesdoo_base.beesdoo_partner_form_view" />
+        <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="priority">50</field>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
@@ -36,23 +36,31 @@
                     <field name="state" widget="statusbar" attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}" />
                 </header>
             </xpath>
-            <page name="work" position="inside">
-                <group>
+            <xpath expr="//field[@name='type']" position="before">
+                <field name="cooperator_type"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Worker information"
+                    attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}"
+                    name="work">
+                    <group name="info_session"/>
                     <group>
-                        <field name="info_session" />
-                        <field name="info_session_date"
-                           attrs="{'invisible': ['|', ('info_session', '=', False)]}" />
-                        <field name="extension_start_time" attrs="{'invisible': [('extension_start_time', '=', False)]}" />
+                        <group>
+                            <field name="info_session" />
+                            <field name="info_session_date"
+                            attrs="{'invisible': ['|', ('info_session', '=', False)]}" />
+                            <field name="extension_start_time" attrs="{'invisible': [('extension_start_time', '=', False)]}" />
+                        </group>
+                        <group>
+                            <field name="working_mode" />
+                            <field name="exempt_reason_id" attrs="{'invisible':[('working_mode', '!=', 'exempt')]}"/>
+                            <field name="super" />
+                        </group>
                     </group>
-                    <group>
-                        <field name="working_mode" />
-                        <field name="exempt_reason_id" attrs="{'invisible':[('working_mode', '!=', 'exempt')]}"/>
-                        <field name="super" />
-                    </group>
-                </group>
-                <separator string="Subscribed Shift" />
-                <field name="subscribed_shift_ids" />
-            </page>
+                    <separator string="Subscribed Shift" />
+                    <field name="subscribed_shift_ids" />
+                </page>
+            </xpath>
         </field>
     </record>
 

@@ -3,7 +3,7 @@
     'name': "Beescoop Base Module",
 
     'summary': """
-    Module that customize the base module and contains some python tools
+        Module that customize the base module and contains some python tools
      """,
 
     'description': """
@@ -30,4 +30,5 @@
         'demo/cooperators.xml',
         'demo/users.xml',
     ]
+    'installable': False,
 }

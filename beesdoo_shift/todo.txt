@@ -1,0 +1,55 @@
+    #2: [TFR] is_worker est calculé selon type de cooperateurs (via autre module gestion des cooperateurs (spécifique à chaque coop))
+      --> Voir http://www.macavrac.be/index.php/s-impliquer pour les types de part et leur association avec is_worker.
+
+    #4 Group shift by day in the website
+
+    #5 Possibility to unsubscribe to your next shift if more then x Days from today (irregular)
+
+BUG #6 Fix traceback in def _get_utc_date when generating shifts 
+
+
+
+
+-------------
+
+Envoyer un mail automatiquement
+1x par mois envoi du planning pour les 4 prochaines semaines. TODO
+
+Vue chacun sur leur créneau à eux. 
+Mail rappel x jours avant. 
+Et possibilité de se désinscrire des créneaux (max 1 semaine avant ou 6 jours et mail rappel 1 semaine avant). + s'inscrire. 
+Chaque coopérateur a son profil avec ses infos.
+
+Les coop doivent faire 13 créneaux par an. 
+
+Créneaux fixes et volants. Ces derniers devraient pouvoir s'inscrire dans les trous. 
+
+Possibility de se désinscrire et réinscrire. TODO jusqu'à 6 jours avant. 
+Message help qui rappelle l'obligation de se désinscrire si on vient pas. 
+Obliger ou pas de se réinscrire sur le moment. Ou message d'info dans le pop-up. 
+
+Notion de vacances. Les coop doivent prendre des shifts de remplacement. 
+
+Gestion des compteurs. 
+Affichage sur le web 3 passages sur 3 => ok. 
+Shift de fin de journée = 1h30 donc 1/2 shift. Comment comptabiliser ça? 
+
+Notion de jours fériés. Cmt on gère? Les réguliers sont exemptés s'ils devaient faire un jour (beescoop). Quid Macavrac? 
+-1 si on est pas venu à un créneau? 
+
+Part A et B. Mais les mêmes droits. Part C et D. Aussi. A voir après. Car faut cocher part A pour être dans le planning (beescoop). Et ce sera différent pour Macavrac. 
+
+Quid shifts des gens qui bossent hors magasin. Exempté. Ou statut ou shifts groupe de travail. 
+
+
+
+Pour les réguliers, dire quand on est inscrit. Ceux faits. Ceux à venir. 
+
+Mail pour dans 2 mois. Et pour la semaine prochaine. 
+
+Mail 7 jours avant. 
+10 janvier, envoyer le mois de février. Et 7 jours avant le jour prévu par coop. TODO
+
+
+
+

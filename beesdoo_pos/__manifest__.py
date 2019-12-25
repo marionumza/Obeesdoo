@@ -31,4 +31,5 @@
     ],
     'qweb': ['static/src/xml/templates.xml'],
     # only loaded in demonstration mode
+    'installable': False,
 }

@@ -8,6 +8,8 @@
             <field name="name">Shift and Worker Access</field>
             <field name="category_id"
                    ref="base.module_category_cooperative_management"/>
+             <field name="implied_ids"
+                   eval="[(4, ref('group_shift_attendance_sheet'))]"/>
         </record>
         <record id="group_shift_management" model="res.groups">
             <field name="name">Shift Management</field>
@@ -28,7 +30,7 @@
             <field name="category_id"
                    ref="base.module_category_cooperative_management"/>
             <field name="implied_ids"
-                   eval="[(4, ref('group_planning_management')), (4, ref('group_shift_attendance_sheet'))]" />
+                   eval="[(4, ref('group_planning_management'))]" />
             <field name="users"
                    eval="[(4, ref('base.user_root')),
                           (4, ref('base.user_admin'))]"/>
