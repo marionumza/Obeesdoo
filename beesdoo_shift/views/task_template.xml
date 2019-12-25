@@ -103,10 +103,9 @@
                     <t t-name="kanban-box">
                         <div
                             t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
-                            <t t-if="widget.editable">
+                            <!--FIXME<t t-if="widget.editable">
                                 <div class="o_dropdown_kanban dropdown"
                                     groups="base.group_user">
-                                    <!-- Following block raises a warning -->
                                     <a class="dropdown-toggle btn"
                                         data-toggle="dropdown" href="#">
                                         <span class="fa fa-bars fa-lg" />
@@ -132,7 +131,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                            </t>
+                            </t>-->
                             <div class="oe_kanban_content">
                                 <strong>
                                     <field name="name" />

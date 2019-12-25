@@ -14,7 +14,7 @@
     'category': 'Cooperative management',
     'version': '9.0.1.2.0',
 
-    'depends': ['beesdoo_base'],
+    'depends': ['base', 'mail'],
 
     'data': [
         "data/stage.xml",
@@ -35,9 +35,9 @@
         "wizard/holiday.xml",
         "wizard/temporary_exemption.xml",
     ],
-    'demo': [
-        "demo/workers.xml",
-        "demo/users.xml",
-        "demo/templates.xml",
-    ]
+    # 'demo': [
+    #     "demo/workers.xml",
+    #     "demo/users.xml",
+    #     "demo/templates.xml",
+    # ]
 }

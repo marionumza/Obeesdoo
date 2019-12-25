@@ -31,11 +31,7 @@ class Task(models.Model):
     planning_id = fields.Many2one(related='task_template_id.planning_id', store=True)
     task_type_id = fields.Many2one('beesdoo.shift.type', string="Task Type")
     worker_id = fields.Many2one('res.partner', track_visibility='onchange',
-                                domain=[
-                                    ('eater', '=', 'worker_eater'),
-                                    ('working_mode', 'in', ('regular', 'irregular')),
-                                    ('state', 'not in', ('unsubscribed', 'resigning')),
-                                ])
+                                domain=[('is_worker', '=', True),('state', 'not in', ('unsubscribed', 'resigning'))])
     start_time = fields.Datetime(track_visibility='always', index=True)
     end_time = fields.Datetime(track_visibility='always')
     stage_id = fields.Many2one('beesdoo.shift.stage', required=True, track_visibility='onchange', default=lambda self: self.env.ref('beesdoo_shift.open'))
@@ -45,7 +41,7 @@ class Task(models.Model):
     # selection field as they are mutually exclusive.
     is_regular = fields.Boolean(default=False, string="Regular shift")
     is_compensation = fields.Boolean(default=False, string="Compensation shift")
-    replaced_id = fields.Many2one('res.partner', track_visibility='onchange', domain=[('eater', '=', 'worker_eater')])
+    replaced_id = fields.Many2one('res.partner', track_visibility='onchange', domain=[('is_worker', '=', True)])
     revert_info = fields.Text(copy=False)
     working_mode = fields.Selection(related='worker_id.working_mode')
 

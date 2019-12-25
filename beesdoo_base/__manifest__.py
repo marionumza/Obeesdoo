@@ -27,4 +27,5 @@
         'data/default_contact.xml',
         'report/beescard.xml',
     ],
+    'installable': False,
 }
