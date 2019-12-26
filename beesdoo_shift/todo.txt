@@ -1,0 +1,4 @@
+#TASK: TODO 
+#1: is_worker dans la vue res.partner
+#2: is_worker est calculé selon type de cooperateurs (via autre module gestion des cooperateurs (spécifique à chaque coop))
+#3: adapter le wizard generate template shift pour que le nom créé soit explicite (tenant compte du type, planning, day, horaires)
