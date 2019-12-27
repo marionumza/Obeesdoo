@@ -6,3 +6,7 @@
 
 #3: adapter le wizard generate template shift pour que le nom créé soit explicite (tenant compte du type, planning, day, horaires)
 [TFR] --> je vois plus le problème :/ 
+
+#4 Group shift by day in the website
+
+#5 Possibility to unsubscribe to your next shift if more then x Days
