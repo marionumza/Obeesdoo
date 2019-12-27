@@ -1,4 +1,8 @@
-#TASK: TODO 
-#1: is_worker dans la vue res.partner
-#2: is_worker est calculé selon type de cooperateurs (via autre module gestion des cooperateurs (spécifique à chaque coop))
+#1: is_worker in res.partner view. 
+--> Cancelled. Is set by clicking on "Subscribe to shift" button. If not, the cooperateur is not set correctly (not available for shifts by e.g.). 
+
+#2:[TFR] is_worker est calculé selon type de cooperateurs (via autre module gestion des cooperateurs (spécifique à chaque coop))
+--> Voir http://www.macavrac.be/index.php/s-impliquer pour les types de part et leur association avec is_worker.
+
 #3: adapter le wizard generate template shift pour que le nom créé soit explicite (tenant compte du type, planning, day, horaires)
+[TFR] --> je vois plus le problème :/ 

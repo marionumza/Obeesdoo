@@ -18,6 +18,7 @@
             <field name="name">Cooperative Admin</field>
             <field name="category_id" ref="base.module_category_cooperative_management"/>
             <field name="implied_ids" eval="[(4, ref('group_planning_management'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
         </record>
     </data>
 </odoo>
