@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright 2017-2018 Rémy Taymans <remytaymans@gmail.com>
+     Copyright 2017-2020 Rémy Taymans <remytaymans@gmail.com>
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 -->
-<openerp>
+<odoo>
 
   <!-- Add menu entries -->
   <template id="my_shift_link" name="Link to frontend portal" inherit_id="website.layout">
-    <xpath expr="//li[@id='o_logout']" position="before">
-      <li><a href="/my/shift" role="menuitem">My Shift</a></li>
+    <xpath expr="//a[@id='o_logout']" position="before">
+      <a href="/my/shift" class="dropdown-item" role="menuitem">My Shift</a>
     </xpath>
   </template>
 
@@ -86,12 +86,12 @@
 
     <p t-if="status.holiday_start_time and status.holiday_start_time > status.today or status.status == 'holiday'">
       <label>Begin of Holiday:</label>
-      <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.holiday_start_time, '%Y-%m-%d'))"/>
+      <t t-esc="status.holiday_start_time.strftime('%A %d %B %Y')"/>
     </p>
 
     <p t-if="status.holiday_end_time and status.holiday_end_time > status.today or status.status == 'holiday'">
       <label>End of Holiday:</label>
-      <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.holiday_end_time, '%Y-%m-%d'))"/>
+      <t t-esc="status.holiday_end_time.strftime('%A %d %B %Y')"/>
     </p>
 
   </template>
@@ -173,7 +173,7 @@
       <div class="panel panel-default">
         <div class="panel-heading clearfix">
           <div class="panel-title">
-            <t t-esc="time.strftime('%A %d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+            <t t-esc="shift.start_time.strftime('%A %d %B %Y')"/>
             <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
             <span t-field="shift.end_time" t-field-options='{"format": "HH:mm"}'/>
             <t t-call="beesdoo_website_shift.shift_status_label">
@@ -209,10 +209,10 @@
         <t t-foreach="subscribed_shifts" t-as="shift">
           <tr t-att-class="'danger text-danger' if shift.state == 'cancel' else ''">
             <td>
-              <t t-esc="time.strftime('%A', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%A')"/>
             </td>
             <td>
-              <t t-esc="time.strftime('%d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%d %B %Y')"/>
             </td>
             <td>
               <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
@@ -306,7 +306,7 @@
       <div class="panel panel-default">
         <div class="panel-heading clearfix">
           <div class="panel-title">
-            <t t-esc="time.strftime('%A %d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+            <t t-esc="shift.start_time.strftime('%A %d %B %Y')"/>
             <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
             <span t-field="shift.end_time" t-field-options='{"format": "HH:mm"}'/>
             <t t-call="beesdoo_website_shift.shift_status_label">
@@ -334,10 +334,10 @@
         <t t-foreach="past_shifts" t-as="shift">
           <tr>
             <td>
-              <t t-esc="time.strftime('%A', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%A')"/>
             </td>
             <td>
-              <t t-esc="time.strftime('%d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%d %B %Y')"/>
             </td>
             <td>
               <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
@@ -385,7 +385,7 @@
       <div t-att-class="'panel %s' % highlight_class">
         <div class="panel-heading clearfix">
           <div class="panel-title pull-left">
-            <t t-esc="time.strftime('%A %d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+            <t t-esc="shift.start_time.strftime('%A %d %B %Y')"/>
             <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
             <span t-field="shift.end_time" t-field-options='{"format": "HH:mm"}'/>
           </div>
@@ -431,10 +431,10 @@
           <t t-set="has_enough_workers" t-value="shift_count_subscribed[3]"/>
           <tr t-attf-class="{{ 'warning' if not has_enough_workers else '' }}">
             <td>
-              <t t-esc="time.strftime('%A', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%A')"/>
             </td>
             <td>
-              <t t-esc="time.strftime('%d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%d %B %Y')"/>
             </td>
             <td>
               <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
@@ -484,8 +484,8 @@
               </h4>
             </div>
             <div class="modal-body">
-              <t t-esc="time.strftime('%A', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
-              <t t-esc="time.strftime('%d %B %Y', time.strptime(shift.start_time, '%Y-%m-%d %H:%M:%S'))"/>
+              <t t-esc="shift.start_time.strftime('%A')"/>
+              <t t-esc="shift.start_time.strftime('%d %B %Y')"/>
               <span t-field="shift.start_time" t-field-options='{"format": "HH:mm"}'/> -
               <span t-field="shift.end_time" t-field-options='{"format": "HH:mm"}'/><br/>
               <t t-esc="shift.task_type_id.name"/><br/>
@@ -618,7 +618,7 @@
   <template
     id="my_shift_non_worker"
     name="My Shift for Non Worker"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -644,7 +644,7 @@
   <template
     id="my_shift_new_worker"
     name="My Shift for New Worker"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -670,7 +670,7 @@
   <template
     id="my_shift_exempted_worker"
     name="My Shifts for Exempted Workers"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -723,7 +723,7 @@
   <template
     id="my_shift_regular_worker_without_shift"
     name="My Shifts for regular worker without shift"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -731,7 +731,7 @@
       <section class="wrap">
         <div class="container">
           <div class="row">
-            <div class="col-xs-12 col-md-4 pull-right text-justify">
+            <div class="col-12 col-lg-4 order-lg-2 text-justify">
 
               <t t-call="beesdoo_website_shift.my_shift_worker_status_title"/>
 
@@ -742,7 +742,7 @@
 
             </div>
 
-            <div class="col-xs-12 col-md-8">
+            <div class="col-12 col-lg-8">
 
               <section class="wrap">
                 <div class="container">
@@ -773,7 +773,7 @@
   <template
     id="my_shift_regular_worker"
     name="My Shifts for Regular Workers"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -799,12 +799,12 @@
 
               <p t-if="status.alert_start_time">
                 <label>In Alert Since:</label>
-                <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.alert_start_time, '%Y-%m-%d'))"/>
+                <t t-esc="status.alert_start_time.strftime('%A %d %B %Y')"/>
               </p>
 
               <p t-if="status.extension_start_time">
                 <label>In Extension Since:</label>
-                <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.extension_start_time, '%Y-%m-%d'))"/>
+                <t t-esc="status.extension_start_time.strftime('%A %d %B %Y')"/>
               </p>
 
               <div class="oe_structure"/>
@@ -843,7 +843,7 @@
   <template
     id="my_shift_irregular_worker"
     name="Shifts for Irregular Workers"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <t t-call="beesdoo_website_shift.my_shift_title"/>
@@ -864,17 +864,17 @@
 
               <p t-if="status.next_countdown_date">
                 <label>Next Countdown Date:</label>
-                <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.next_countdown_date, '%Y-%m-%d'))"/>
+                <t t-esc="status.next_countdown_date.strftime('%A %d %B %Y')"/>
               </p>
 
               <p t-if="status.future_alert_date">
                 <label>Future Date of Alert:</label>
-                <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.future_alert_date, '%Y-%m-%d'))"/>
+                <t t-esc="status.future_alert_date.strftime('%A %d %B %Y')"/>
               </p>
 
               <p t-if="status.irregular_absence_date">
                 <label>Last Absence Date:</label>
-                <t t-esc="time.strftime('%A %d %B %Y', time.strptime(status.irregular_absence_date, '%Y-%m-%d'))"/>
+                <t t-esc="status.irregular_absence_date.strftime('%A %d %B %Y')"/>
               </p>
 
               <p t-if="status.irregular_absence_counter">
@@ -963,4 +963,4 @@
     </t>
   </template>
 
-</openerp>
+</odoo>

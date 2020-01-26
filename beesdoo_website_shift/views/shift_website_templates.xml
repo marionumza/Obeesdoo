@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright 2017-2018 Rémy Taymans <remytaymans@gmail.com>
+     Copyright 2017-2020 Rémy Taymans <remytaymans@gmail.com>
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 -->
-<openerp>
+<odoo>
 
   <!-- Add menu entries -->
   <data noupdate="1">
@@ -25,7 +25,7 @@
   <template
     id="public_shift_template_regular_worker"
     name="Available Tasks Templates for Regular Workers"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <div class="oe_structure"/>
@@ -64,30 +64,31 @@
 
               <div class="oe_structure"/>
 
-              <div class="visible-xs" t-foreach="task_tpls_data" t-as="template_data">
+              <div class="d-sm-none" t-foreach="task_tpls_data" t-as="template_data">
                 <t t-set="template" t-value="template_data[0]"/>
                 <t t-set="has_enough_workers" t-value="template_data[1]"/>
-                <t t-set="highlight_class" t-value="'panel-warning' if not has_enough_workers else 'panel-default'"/>
-                <div t-att-class="'panel %s' % highlight_class">
-                  <div class="panel-heading clearfix">
-                    <div class="panel-title pull-left">
+                <t t-set="highlight_header_class" t-value="'bg-warning' if not has_enough_workers else ''"/>
+                <t t-set="highlight_class" t-value="'border-warning' if not has_enough_workers else ''"/>
+                <div t-att-class="'card mt-4 %s' % highlight_class">
+                  <div t-att-class="'card-header %s clearfix' % highlight_header_class">
+                    <div class="pull-left">
                       <t t-esc="template.planning_id.name"/> :
                       <t t-esc="template.day_nb_id.name"/>
                       <t t-esc='float_to_time(template.start_time)' /> -
                       <t t-esc='float_to_time(template.end_time)'/>
                     </div>
-                    <div class="label label-default pull-right"
+                    <div class="badge badge-secondary pull-right"
                       t-if="template.remaining_worker > 0">
                       <t t-esc="template.remaining_worker"/> space(s)
                     </div>
-                    <div class="label label-default pull-right"
+                    <div class="badge badge-secondary pull-right"
                       t-if="template.remaining_worker == 0">
                       full
                     </div>
                   </div>
-                  <div class="panel-body clearfix">
+                  <div class="card-body clearfix">
                     <t t-esc="template.task_type_id.name"/>
-                    <div class="label label-warning pull-right"
+                    <div class="badge badge-warning pull-right"
                       t-if="not template.super_coop_id">
                       Need Super Co-operator
                     </div>
@@ -95,7 +96,7 @@
                 </div>
               </div>
 
-              <table class="hidden-xs table table-striped">
+              <table class="d-none d-sm-table table table-striped">
                 <thead>
                   <tr>
                     <th>Week</th>
@@ -111,7 +112,7 @@
                     <t t-set="template" t-value="template_data[0]"/>
                     <t t-set="has_enough_workers" t-value="template_data[1]"/>
                     <!-- Row with no super coop will be shown in color -->
-                    <tr t-attf-class="{{ 'warning' if not has_enough_workers else '' }}">
+                    <tr t-attf-class="{{ 'table-warning' if not has_enough_workers else '' }}">
                       <td>
                         <t t-esc="template.planning_id.name"/>
                       </td>
@@ -156,7 +157,7 @@
   <template
     id="public_shift_irregular_worker"
     name="Available Shifts for Irregular Workers"
-    page="True">
+  >
     <t t-call="website.layout">
 
       <div class="oe_structure"/>
@@ -206,4 +207,4 @@
     </t>
   </template>
 
-</openerp>
+</odoo>
