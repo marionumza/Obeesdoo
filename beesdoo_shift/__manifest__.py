@@ -14,7 +14,10 @@
     'category': 'Cooperative management',
     'version': '12.0.1.0.0',
 
-    'depends': ['beesdoo_base', 'barcodes'],
+    'depends': [
+        'mail', 
+        'barcodes', #Need for attendance_sheet that will be move to another module
+    ],
 
     'data': [
         "data/system_parameter.xml",
@@ -39,6 +42,7 @@
         "wizard/temporary_exemption.xml",
     ],
     'demo': [
+        "demo/cooperators.xml",
         "demo/workers.xml",
         "demo/users.xml",
         "demo/templates.xml",

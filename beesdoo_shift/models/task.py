@@ -13,19 +13,8 @@ class Task(models.Model):
 
     _order = "start_time asc"
 
-    name = fields.Char(track_visibility='always')
-    task_template_id = fields.Many2one('beesdoo.shift.template')
-    planning_id = fields.Many2one(related='task_template_id.planning_id', store=True)
-    task_type_id = fields.Many2one('beesdoo.shift.type', string="Task Type")
-    worker_id = fields.Many2one('res.partner', track_visibility='onchange',
-                                domain=[
-                                    ('eater', '=', 'worker_eater'),
-                                    ('working_mode', 'in', ('regular', 'irregular')),
-                                    ('state', 'not in', ('unsubscribed', 'resigning')),
-                                ])
-    start_time = fields.Datetime(track_visibility='always', index=True, required=True)
-    end_time = fields.Datetime(track_visibility='always', required=True)
-    state = fields.Selection(selection=[
+    def _get_selection_status(self):
+        return [
             ("draft","Unconfirmed"),
             ("open","Confirmed"),
             ("done","Attended"),
@@ -33,7 +22,21 @@ class Task(models.Model):
             ("absent_1","Absent - 1 compensation"),
             ("absent_0","Absent - 0 compensation"),
             ("cancel","Cancelled")
-    ],
+        ]
+
+    name = fields.Char(track_visibility='always')
+    task_template_id = fields.Many2one('beesdoo.shift.template')
+    planning_id = fields.Many2one(related='task_template_id.planning_id', store=True)
+    task_type_id = fields.Many2one('beesdoo.shift.type', string="Task Type")
+    worker_id = fields.Many2one('res.partner', track_visibility='onchange',
+                                domain=[
+                                    ('is_worker', '=', True),
+                                    ('working_mode', 'in', ('regular', 'irregular')),
+                                    ('state', 'not in', ('unsubscribed', 'resigning')),
+                                ])
+    start_time = fields.Datetime(track_visibility='always', index=True, required=True)
+    end_time = fields.Datetime(track_visibility='always', required=True)
+    state = fields.Selection(selection=_get_selection_status,
         default="open",
         required=True,
         store=True,

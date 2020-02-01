@@ -20,7 +20,6 @@
             <field name="interval_type">weeks</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False" />
-            <field name="active" eval="False" />
         </record>
 
 
@@ -47,6 +46,7 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="True" />
             <field name="active" eval="False" />
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_check_non_validated_sheet" model="ir.cron">

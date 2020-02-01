@@ -4,31 +4,6 @@ from odoo.exceptions import ValidationError, UserError
 from datetime import timedelta, datetime
 import logging
 
-_logger = logging.getLogger(__name__)
-PERIOD = 28  # TODO: use system parameter
-
-def add_days_delta(date_from, days_delta):
-    if not date_from:
-        return date_from
-    next_date = date_from + timedelta(days=days_delta)
-    return next_date
-
-class ExemptReason(models.Model):
-    _name = 'cooperative.exempt.reason'
-
-    name = fields.Char(required=True)
-
-class HistoryStatus(models.Model):
-    _name = 'cooperative.status.history'
-
-    _order= 'create_date desc'
-
-    status_id = fields.Many2one('cooperative.status')
-    cooperator_id = fields.Many2one('res.partner')
-    change = fields.Char()
-    type = fields.Selection([('status', 'Status Change'), ('counter', 'Counter Change')])
-    user_id = fields.Many2one('res.users', string="User")
-
 class CooperativeStatus(models.Model):
     _name = 'cooperative.status'
     _rec_name = 'cooperator_id'
@@ -100,9 +75,9 @@ class CooperativeStatus(models.Model):
                  'irregular_absence_counter', 'temporary_exempt_start_date',
                  'temporary_exempt_end_date', 'resigning', 'cooperator_id.subscribed_shift_ids')
     def _compute_status(self):
-        alert_delay = int(self.env['ir.config_parameter'].sudo().get_param('alert_delay', 28))
-        grace_delay = int(self.env['ir.config_parameter'].sudo().get_param('default_grace_delay', 10))
-        update = int(self.env['ir.config_parameter'].sudo().get_param('always_update', False))
+        alert_delay = int(self.env['ir.config_parameter'].get_param('alert_delay', 28))
+        grace_delay = int(self.env['ir.config_parameter'].get_param('default_grace_delay', 10))
+        update = int(self.env['ir.config_parameter'].get_param('always_update', False))
         for rec in self:
             if update or not rec.today:
                 rec.status = 'ok'
@@ -228,7 +203,7 @@ class CooperativeStatus(models.Model):
 
     def _set_regular_status(self, grace_delay, alert_delay):
         self.ensure_one()
-        counter_unsubscribe = int(self.env['ir.config_parameter'].sudo().get_param('regular_counter_to_unsubscribe', -4))
+        counter_unsubscribe = int(self.env['ir.config_parameter'].get_param('regular_counter_to_unsubscribe', -4))
         ok = self.sr >= 0 and self.sc >= 0
         grace_delay = grace_delay + self.time_extension
 
@@ -270,7 +245,7 @@ class CooperativeStatus(models.Model):
             self.can_shop = True
 
     def _set_irregular_status(self, grace_delay, alert_delay):
-        counter_unsubscribe = int(self.env['ir.config_parameter'].sudo().get_param('irregular_counter_to_unsubscribe', -3))
+        counter_unsubscribe = int(self.env['ir.config_parameter'].get_param('irregular_counter_to_unsubscribe', -3))
         self.ensure_one()
         ok = self.sr >= 0
         grace_delay = grace_delay + self.time_extension
@@ -426,96 +401,19 @@ class CooperativeStatus(models.Model):
                 journal.line_ids |= status
 
 
-class ShiftCronJournal(models.Model):
-    _name = 'beesdoo.shift.journal'
-    _order = 'date desc'
-    _rec_name = 'date'
-
-    date = fields.Date()
-    line_ids = fields.Many2many('cooperative.status')
-
-    _sql_constraints = [
-        ('one_entry_per_day', 'unique (date)', _('You can only create one journal per day')),
-    ]
-
-    @api.multi
-    def run(self):
-        self.ensure_one()
-        if not self.user_has_groups('beesdoo_shift.group_cooperative_admin'):
-            raise ValidationError(_("You don't have the access to perform this action"))
-        self.sudo().env['cooperative.status']._cron_compute_counter_irregular(today=self.date)
-
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    worker_store = fields.Boolean(default=False)
-    is_worker = fields.Boolean(related="worker_store", string="Worker", readonly=False)
-    cooperative_status_ids = fields.One2many('cooperative.status', 'cooperator_id', readonly=True)
-    super = fields.Boolean(related='cooperative_status_ids.super', string="Super Cooperative", readonly=True, store=True)
-    info_session = fields.Boolean(related='cooperative_status_ids.info_session', string='Information Session ?', readonly=True, store=True)
-    info_session_date = fields.Date(related='cooperative_status_ids.info_session_date', string='Information Session Date', readonly=True, store=True)
-    working_mode = fields.Selection(related='cooperative_status_ids.working_mode', readonly=True, store=True)
-    exempt_reason_id = fields.Many2one(related='cooperative_status_ids.exempt_reason_id', readonly=True, store=True)
-    state = fields.Selection(related='cooperative_status_ids.status', readonly=True, store=True)
-    extension_start_time = fields.Date(related='cooperative_status_ids.extension_start_time', string="Extension Start Day", readonly=True, store=True)
-    subscribed_shift_ids = fields.Many2many('beesdoo.shift.template')
+    is_worker = fields.Boolean(compute="_is_worker", search="_search_worker")
 
-    @api.multi
-    def coop_subscribe(self):
-        return {
-           'name': _('Subscribe Cooperator'),
-           'type': 'ir.actions.act_window',
-           'view_type': 'form',
-           'view_mode': 'form',
-           'res_model': 'beesdoo.shift.subscribe',
-           'target': 'new',
-        }
+    def _is_worker(self):
+        for rec in self:
+            rec.is_worker = rec.cooperator_type == 'share_a'
 
-    @api.multi
-    def coop_unsubscribe(self):
-        res = self.coop_subscribe()
-        res['context'] = {'default_unsubscribed': True}
-        return res
-
-    @api.multi
-    def manual_extension(self):
-        return {
-           'name': _('Manual Extension'),
-           'type': 'ir.actions.act_window',
-           'view_type': 'form',
-           'view_mode': 'form',
-           'res_model': 'beesdoo.shift.extension',
-           'target': 'new',
-        }
-
-    @api.multi
-    def auto_extension(self):
-        res = self.manual_extension()
-        res['context'] = {'default_auto': True}
-        res['name'] = _('Trigger Grace Delay')
-        return res
-
-    @api.multi
-    def register_holiday(self):
-        return {
-           'name': _('Register Holiday'),
-           'type': 'ir.actions.act_window',
-           'view_type': 'form',
-           'view_mode': 'form',
-           'res_model': 'beesdoo.shift.holiday',
-           'target': 'new',
-        }
-
-    @api.multi
-    def temporary_exempt(self):
-        return {
-           'name': _('Temporary Exemption'),
-           'type': 'ir.actions.act_window',
-           'view_type': 'form',
-           'view_mode': 'form',
-           'res_model': 'beesdoo.shift.temporary_exemption',
-           'target': 'new',
-        }
-
+    def _search_worker(self, operator, value):
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return [('cooperator_type', '=', 'share_a')]
+        else:
+            return [('cooperator_type', '!=', 'share_a')]
     #TODO access right + vue on res.partner
     #TODO can_shop : Status can_shop ou extempted ou part C

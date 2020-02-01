@@ -9,7 +9,7 @@
     'name': "Beescoop Base Module",
 
     'summary': """
-    Module that customize the base module and contains some python tools
+        Module that customize the base module and contains some python tools
      """,
 
     'description': """
@@ -32,9 +32,9 @@
         'data/default_contact.xml',
         'report/beescard.xml',
     ],
-    'installable': True,
     'demo': [
         'demo/cooperators.xml',
         'demo/users.xml',
     ]
+    'installable': False,
 }

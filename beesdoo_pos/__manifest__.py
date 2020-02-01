@@ -32,6 +32,6 @@
         'data/cron.xml',
     ],
     'qweb': ['static/src/xml/templates.xml'],
-
-    'installable': True,
+    # only loaded in demonstration mode
+    'installable': False,
 }

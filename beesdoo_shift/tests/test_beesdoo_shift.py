@@ -165,16 +165,16 @@ class TestBeesdooShift(TransactionCase):
         for task_type in (self.task_type_1, self.task_type_2):
             # Setting default value
             setting_wizard_1 = self.setting_wizard.create(
-                {"task_type_default_id": task_type.id}
+                {"default_task_type_id": task_type.id}
             )
             setting_wizard_1.execute()
             param_id = self.env["ir.config_parameter"].sudo().get_param(
-                "beesdoo_shift.task_type_default_id"
+                "beesdoo_shift.default_task_type_id"
             )
             self.assertEqual(int(param_id), task_type.id)
             # Check propagation on attendance sheet shifts
             self.assertEqual(
-                self.attendance_sheet_shift_model.task_type_default_id(),
+                self.attendance_sheet_shift_model.default_task_type_id(),
                 task_type,
             )
 
@@ -184,7 +184,7 @@ class TestBeesdooShift(TransactionCase):
         # Set generation interval setting
         setting_wizard_1 = self.setting_wizard.create(
             {
-                "task_type_default_id": self.task_type_1.id,
+                "default_task_type_id": self.task_type_1.id,
                 "attendance_sheet_generation_interval": 15,
             }
         )
@@ -300,7 +300,7 @@ class TestBeesdooShift(TransactionCase):
             self.assertEqual(shift.state, "done")
             self.assertEqual(
                 shift.task_type_id,
-                self.attendance_sheet_shift_model.task_type_default_id(),
+                self.attendance_sheet_shift_model.default_task_type_id(),
             )
             if shift.working_mode == "regular":
                 self.assertTrue(shift.is_compensation)

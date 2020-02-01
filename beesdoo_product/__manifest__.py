@@ -30,5 +30,5 @@
         'wizard/views/label_printing_utils.xml',
         'security/ir.model.access.csv',
     ],
-    'installable': True,
+    'installable': False,
 }
