@@ -29,6 +29,6 @@
     'demo': [
         'demo/cooperators.xml',
         'demo/users.xml',
-    ]
+    ],
     'installable': False,
 }

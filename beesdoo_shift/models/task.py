@@ -30,7 +30,7 @@ class Task(models.Model):
     task_type_id = fields.Many2one('beesdoo.shift.type', string="Task Type")
     worker_id = fields.Many2one('res.partner', track_visibility='onchange',
                                 domain=[
-                                    ('eater', '=', 'worker_eater'),
+                                    ('is_worker', '=', True),
                                     ('working_mode', 'in', ('regular', 'irregular')),
                                     ('state', 'not in', ('unsubscribed', 'resigning')),
                                 ])

@@ -38,7 +38,7 @@ class AttendanceSheetShift(models.AbstractModel):
         "res.partner",
         string="Worker",
         domain=[
-            ("eater", "=", "worker_eater"),
+            ("is_worker", "=", True),
             ("working_mode", "in", ("regular", "irregular")),
             ("state", "not in", ("unsubscribed", "resigning")),
         ],
@@ -600,11 +600,11 @@ class AttendanceSheet(models.Model):
 
         tasks = tasks.search(
             [
-                ("start_time", ">", str(current_time),),
-                ("start_time", "<", str(current_time + allowed_time_range),),
+                #("start_time", ">", str(current_time),),
+                #("start_time", "<", str(current_time + allowed_time_range),),
             ]
         )
-
+        print(tasks)
         for task in tasks:
             start_time = task.start_time
             end_time = task.end_time

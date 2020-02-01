@@ -28,7 +28,7 @@
         <field name="color">4</field>
         <field name="description">Caisse, remplissage des rayons, accueil.</field>
     </record>
-
+    <!-- TODO move to data -->
     <record id="beesdoo_shift_daynumber_1_demo" model="beesdoo.shift.daynumber">
         <field name="name">Lundi</field>
         <field name="number">1</field>

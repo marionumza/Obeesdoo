@@ -9,39 +9,39 @@
                 <header>
                     <button name="coop_subscribe" string="Subscribe to shift" class="oe_highlight"
                             type="object" groups="beesdoo_shift.group_shift_management"
-                            attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}"/>
+                            attrs="{'invisible': [('is_worker', '=', False)]}"/>
                    <button name="auto_extension" string="Auto Extension" class="oe_highlight"
                             type="object" groups="beesdoo_shift.group_shift_attendance"
                             attrs="{'invisible': ['|',
-                                                    ('cooperator_type', '!=', 'share_a'),
+                                                    ('is_worker', '=', False),
                                                     '|',
                                                         ('state', '!=', 'suspended'),
                                                         ('extension_start_time', '!=', False)]}" />
                    <button name="manual_extension" string="Manual Extension" class="oe_highlight"
                             type="object" groups="beesdoo_shift.group_shift_management"
                             attrs="{'invisible': ['|',
-                                                    ('cooperator_type', '!=', 'share_a'),
+                                                    ('is_worker', '=', False),
                                                     '|',
                                                         ('state', '!=', 'suspended'),
                                                         ('extension_start_time', '=', False)]}" />
                    <button name="coop_unsubscribe" string="Unsubscribe" class="oe_highlight"
                             type="object" groups="beesdoo_shift.group_shift_management"
-                            attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}"/>
+                            attrs="{'invisible': [('is_worker', '=', False)]}"/>
                   <button name="register_holiday" string="Register Holidays" class="oe_highlight"
                             type="object" groups="beesdoo_shift.group_shift_management"
-                            attrs="{'invisible': ['|', ('cooperator_type', '!=', 'share_a'), ('state', '!=', 'ok')]}"/>
+                            attrs="{'invisible': ['|', ('is_worker', '=', False), ('state', '!=', 'ok')]}"/>
                   <button name="temporary_exempt" string="Temporary Exemption"
                             type="object" groups="beesdoo_shift.group_shift_management"
-                            attrs="{'invisible': ['|', ('cooperator_type', '!=', 'share_a'), ('state', '=', 'unsubscribed')]}"/>
-                    <field name="state" widget="statusbar" attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}" />
+                            attrs="{'invisible': ['|', ('is_worker', '=', False), ('state', '=', 'unsubscribed')]}"/>
+                    <field name="state" widget="statusbar" attrs="{'invisible': [('is_worker', '=', False)]}" />
                 </header>
             </xpath>
             <xpath expr="//field[@name='type']" position="before">
-                <field name="cooperator_type"/>
+                <field name="is_worker"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Worker information"
-                    attrs="{'invisible': [('cooperator_type', '!=', 'share_a')]}"
+                    attrs="{'invisible': [('is_worker', '=', False)]}"
                     name="work">
                     <group name="info_session"/>
                     <group>
@@ -183,7 +183,7 @@
         <field name="name">Worker</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('cooperator_type', '=', 'share_a')]</field>
+        <field name="domain">[('is_worker', '=', True)]</field>
     </record>
 
     <menuitem name="Worker" id="menu_worker_top" parent="menu_root"

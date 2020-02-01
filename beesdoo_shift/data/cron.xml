@@ -8,6 +8,7 @@
             <field name="doall" eval="False" />
             <field name="model_id" ref="model_cooperative_status" />
             <field name="code">model._set_today()</field>
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_generate_next_planning" model="ir.cron">
@@ -19,6 +20,7 @@
             <field name="model_id" ref="model_beesdoo_shift_planning" />
             <field name="code">model._generate_next_planning()</field>
             <field name="active" eval="False" />
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_generate_attendance_sheet" model="ir.cron">
@@ -30,6 +32,7 @@
             <field name="model_id" ref="model_beesdoo_shift_sheet" />
             <field name="code">model._generate_attendance_sheet()</field>
             <field name="active" eval="False" />
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_compute_shift_counter" model="ir.cron">
@@ -41,6 +44,7 @@
             <field name="model_id" ref="model_cooperative_status" />
             <field name="code">model._cron_compute_counter_irregular()</field>
             <field name="active" eval="False" />
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_check_non_validated_sheet" model="ir.cron">
@@ -53,6 +57,7 @@
             <field name="model_id" ref="model_beesdoo_shift_sheet" />
             <field name="code">model._cron_non_validated_sheets()</field>
             <field name="active" eval="False" />
+            <field name="state">code</field>
         </record>
 
         <record id="ir_cron_send_weekly_emails" model="ir.cron">
@@ -67,6 +72,7 @@
           <field name="model_id" ref="model_beesdoo_shift_shift" />
           <field name="code">_cron_send_weekly_emails()</field>
           <field name="active" eval="False" />
+          <field name="state">code</field>
         </record>
 
     </data>

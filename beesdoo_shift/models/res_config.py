@@ -19,6 +19,7 @@ class ShiftConfigSettings(models.TransientModel):
         "beesdoo.shift.type",
         string="Default Task Type",
         help="Default task type for attendance sheet pre-filling",
+        default_model="beesdoo.shift.sheet.added",
         required=True,
     )
     attendance_sheet_generation_interval = fields.Integer(
