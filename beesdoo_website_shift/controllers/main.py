@@ -185,7 +185,7 @@ class WebsiteShiftController(http.Controller):
 
         # Get config
         regular_highlight_rule = literal_eval(
-            request.env['ir.config_parameter'].get_param(
+            request.env['ir.config_parameter'].sudo().get_param(
                 'beesdoo_website_shift.regular_highlight_rule'
             )
         )
