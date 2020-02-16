@@ -70,7 +70,7 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'irregular_shift_limit': int(
                 self.env['ir.config_parameter']
-                .get_param("beesdoo_website_shift.irregular_shift_limit")
+                .sudo().get_param("beesdoo_website_shift.irregular_shift_limit")
             )
         }
 
@@ -79,14 +79,14 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'highlight_rule_pc': int(
                 self.env['ir.config_parameter']
-                .get_param("beesdoo_website_shift.highlight_rule_pc")
+                .sudo().get_param("beesdoo_website_shift.highlight_rule_pc")
             )
         }
 
     @api.multi
     def get_default_hide_rule(self):
         return {
-            'hide_rule': int(self.env['ir.config_parameter'].get_param(
+            'hide_rule': int(self.env['ir.config_parameter'].sudo().get_param(
                 'beesdoo_website_shift.hide_rule'))
         }
 
@@ -94,7 +94,7 @@ class WebsiteShiftConfigSettings(models.TransientModel):
     def get_default_irregular_shift_sign_up(self):
         return {
             'irregular_enable_sign_up':
-                literal_eval(self.env['ir.config_parameter'].get_param(
+                literal_eval(self.env['ir.config_parameter'].sudo().get_param(
                     'beesdoo_website_shift.irregular_enable_sign_up'))
         }
 
@@ -103,7 +103,7 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'irregular_past_shift_limit': int(
                 self.env['ir.config_parameter']
-                .get_param("beesdoo_website_shift.irregular_past_shift_limit")
+                .sudo().get_param("beesdoo_website_shift.irregular_past_shift_limit")
             )
         }
 
@@ -112,7 +112,7 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'regular_past_shift_limit': int(
                 self.env['ir.config_parameter']
-                .get_param('beesdoo_website_shift.regular_past_shift_limit')
+                .sudo().get_param('beesdoo_website_shift.regular_past_shift_limit')
             )
         }
 
@@ -121,7 +121,7 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'regular_next_shift_limit': int(
                 self.env['ir.config_parameter']
-                .get_param('beesdoo_website_shift.regular_next_shift_limit')
+                .sudo().get_param('beesdoo_website_shift.regular_next_shift_limit')
             )
         }
 
@@ -130,6 +130,6 @@ class WebsiteShiftConfigSettings(models.TransientModel):
         return {
             'regular_highlight_rule': int(
                 self.env['ir.config_parameter']
-                .get_param('beesdoo_website_shift.regular_highlight_rule')
+                .sudo().get_param('beesdoo_website_shift.regular_highlight_rule')
             )
         }

@@ -60,8 +60,8 @@ class Planning(models.Model):
     @api.model
     def _generate_next_planning(self):
         config = self.env['ir.config_parameter']
-        last_seq = int(config.get_param('last_planning_seq', 0))
-        date = config.get_param('next_planning_date', 0)
+        last_seq = int(config.sudo().get_param('last_planning_seq', 0))
+        date = config.sudo().get_param('next_planning_date', 0)
 
         planning = self._get_next_planning(last_seq)
         planning = planning.with_context(visualize_date=date)

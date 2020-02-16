@@ -140,7 +140,7 @@ class WebsiteShiftController(http.Controller):
         # Get the shift
         shift = request.env['beesdoo.shift.shift'].sudo().browse(shift_id)
         # Get config
-        irregular_enable_sign_up = literal_eval(request.env['ir.config_parameter'].get_param(
+        irregular_enable_sign_up = literal_eval(request.env['ir.config_parameter'].sudo().get_param(
             'beesdoo_website_shift.irregular_enable_sign_up'))
         # Get open status
         open_status = request.env.ref('beesdoo_shift.open')
@@ -212,7 +212,7 @@ class WebsiteShiftController(http.Controller):
         Return template variables for 'beesdoo_website_shift.my_shift_irregular_worker' template
         """
         # Get config
-        irregular_enable_sign_up = literal_eval(request.env['ir.config_parameter'].get_param(
+        irregular_enable_sign_up = literal_eval(request.env['ir.config_parameter'].sudo().get_param(
             'beesdoo_website_shift.irregular_enable_sign_up'))
 
         # Create template context
@@ -297,15 +297,15 @@ class WebsiteShiftController(http.Controller):
         # Get config
         irregular_shift_limit = int(
             request.env['ir.config_parameter']
-            .get_param('beesdoo_website_shift.irregular_shift_limit')
+            .sudo().get_param('beesdoo_website_shift.irregular_shift_limit')
         )
         highlight_rule_pc = int(
             request.env['ir.config_parameter']
-            .get_param('beesdoo_website_shift.highlight_rule_pc')
+            .sudo().get_param('beesdoo_website_shift.highlight_rule_pc')
         )
         hide_rule = int(
             request.env['ir.config_parameter']
-            .get_param('beesdoo_website_shift.hide_rule')
+            .sudo().get_param('beesdoo_website_shift.hide_rule')
         ) / 100.0
 
         # Grouby task_template_id, if no task_template_id is specified
@@ -390,7 +390,7 @@ class WebsiteShiftController(http.Controller):
                 )
 
             # Get config
-            regular_next_shift_limit = int(request.env['ir.config_parameter'].get_param(
+            regular_next_shift_limit = int(request.env['ir.config_parameter'].sudo().get_param(
                 'beesdoo_website_shift.regular_next_shift_limit'))
 
             # Get default status for fictive shifts
@@ -436,10 +436,10 @@ class WebsiteShiftController(http.Controller):
         # Get config
         past_shift_limit = 0
         if self.is_user_irregular():
-            past_shift_limit = int(request.env['ir.config_parameter'].get_param(
+            past_shift_limit = int(request.env['ir.config_parameter'].sudo().get_param(
                 'beesdoo_website_shift.irregular_past_shift_limit'))
         if self.is_user_regular():
-            past_shift_limit = int(request.env['ir.config_parameter'].get_param(
+            past_shift_limit = int(request.env['ir.config_parameter'].sudo().get_param(
                 'beesdoo_website_shift.regular_past_shift_limit'))
         # Get shifts where user was subscribed
         now = datetime.now()

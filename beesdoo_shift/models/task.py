@@ -178,7 +178,7 @@ class Task(models.Model):
     def _update_stage(self, new_stage):
         self.ensure_one()
         self._revert()
-        update = int(self.env['ir.config_parameter'].get_param('always_update', False))
+        update = int(self.env['ir.config_parameter'].sudo().get_param('always_update', False))
 
         new_stage = self.env['beesdoo.shift.stage'].browse(new_stage)
         data = {}
