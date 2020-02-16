@@ -5,4 +5,3 @@ from . import subscribe
 from . import extension
 from . import holiday
 from . import temporary_exemption
-from . import validate_attendance_sheet

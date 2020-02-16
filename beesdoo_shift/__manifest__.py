@@ -8,7 +8,7 @@
 
     """,
 
-    'author': "Thibault Francois, Elouan Le Bars, Coop It Easy",
+    'author': "THibault Francois, Elouan Le Bars, Coop It Easy",
     'website': "https://github.com/beescoop/Obeesdoo",
 
     'category': 'Cooperative management',
@@ -16,7 +16,6 @@
 
     'depends': [
         'mail', 
-        'barcodes', #Need for attendance_sheet that will be move to another module
     ],
 
     'data': [
@@ -26,13 +25,10 @@
         "security/group.xml",
         "security/ir.model.access.csv",
         "views/task_template.xml",
-        #"views/res_config_settings_view.xml",
         "views/task.xml",
         "views/planning.xml",
         "views/cooperative_status.xml",
         "views/exempt_reason.xml",
-        "wizard/validate_attendance_sheet.xml",
-        "views/attendance_sheet.xml",
         "wizard/instanciate_planning.xml",
         "wizard/batch_template.xml",
         "wizard/assign_super_coop.xml",

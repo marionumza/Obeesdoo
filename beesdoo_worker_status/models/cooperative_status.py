@@ -5,96 +5,18 @@ from datetime import timedelta, datetime
 import logging
 
 class CooperativeStatus(models.Model):
-    _name = 'cooperative.status'
-    _rec_name = 'cooperator_id'
-    _order = 'cooperator_id'
+    _inherit = 'cooperative.status'
+    _period = 28
 
-    def get_status_value(self):
-        """
-        Workararound to get translated selection value instead of key in mail template.
-        """
+    ######################################################
+    #                                                    #
+    #   Override of method to define status behavior     #
+    #                                                    #
+    ######################################################
 
-        state_list = self.env["cooperative.status"]._fields["status"].selection
-        state_list = self.env["cooperative.status"]._fields['status']._description_selection(self.env)
-
-        return dict(state_list)[self.status]
-
-    today = fields.Date(help="Field that allow to compute field and store them even if they are based on the current date", default=fields.Date.today)
-    cooperator_id = fields.Many2one('res.partner')
-    active = fields.Boolean(related="cooperator_id.active", store=True, index=True)
-    info_session = fields.Boolean('Information Session ?')
-    info_session_date = fields.Date('Information Session Date')
-    super = fields.Boolean("Super Cooperative")
-    sr = fields.Integer("Regular shifts counter", default=0)
-    sc = fields.Integer("Compensation shifts counter", default=0)
-    time_extension = fields.Integer("Extension Days NB", default=0, help="Addtional days to the automatic extension, 5 mean that you have a total of 15 extension days of default one is set to 10")
-    holiday_start_time = fields.Date("Holidays Start Day")
-    holiday_end_time = fields.Date("Holidays End Day")
-    alert_start_time = fields.Date("Alert Start Day")
-    extension_start_time = fields.Date("Extension Start Day")
-    #Champ compute
-    working_mode = fields.Selection(
-        [
-            ('regular', 'Regular worker'),
-            ('irregular', 'Irregular worker'),
-            ('exempt', 'Exempted'),
-        ],
-        string="Working mode"
-    )
-    exempt_reason_id = fields.Many2one('cooperative.exempt.reason', 'Exempt Reason')
-    status = fields.Selection([('ok',  'Up to Date'),
-                               ('holiday', 'Holidays'),
-                               ('alert', 'Alerte'),
-                               ('extension', 'Extension'),
-                               ('suspended', 'Suspended'),
-                               ('exempted', 'Exempted'),
-                               ('unsubscribed', 'Unsubscribed'),
-                               ('resigning', 'Resigning')],
-                              compute="_compute_status", string="Cooperative Status", store=True)
-    can_shop = fields.Boolean(compute='_compute_status', store=True)
-    history_ids = fields.One2many('cooperative.status.history', 'status_id', readonly=True)
-    unsubscribed = fields.Boolean(default=False, help="Manually unsubscribed")
-    resigning = fields.Boolean(default=False, help="Want to leave the beescoop")
-
-    #Specific to irregular
-    irregular_start_date = fields.Date()  #TODO migration script
-    irregular_absence_date = fields.Date()
-    irregular_absence_counter = fields.Integer() #TODO unsubscribe when reach -2
     future_alert_date = fields.Date(compute='_compute_future_alert_date')
     next_countdown_date = fields.Date(compute='_compute_next_countdown_date')
 
-    temporary_exempt_reason_id = fields.Many2one('cooperative.exempt.reason', 'Exempt Reason')
-    temporary_exempt_start_date = fields.Date()
-    temporary_exempt_end_date = fields.Date()
-
-
-    @api.depends('today', 'sr', 'sc', 'holiday_end_time',
-                 'holiday_start_time', 'time_extension',
-                 'alert_start_time', 'extension_start_time',
-                 'unsubscribed', 'irregular_absence_date',
-                 'irregular_absence_counter', 'temporary_exempt_start_date',
-                 'temporary_exempt_end_date', 'resigning', 'cooperator_id.subscribed_shift_ids')
-    def _compute_status(self):
-        alert_delay = int(self.env['ir.config_parameter'].get_param('alert_delay', 28))
-        grace_delay = int(self.env['ir.config_parameter'].get_param('default_grace_delay', 10))
-        update = int(self.env['ir.config_parameter'].get_param('always_update', False))
-        for rec in self:
-            if update or not rec.today:
-                rec.status = 'ok'
-                rec.can_shop = True
-                continue
-            if rec.resigning:
-                rec.status = 'resigning'
-                rec.can_shop = False
-                continue
-
-            if rec.working_mode == 'regular':
-                rec._set_regular_status(grace_delay, alert_delay)
-            elif rec.working_mode == 'irregular':
-                rec._set_irregular_status(grace_delay, alert_delay)
-            elif rec.working_mode == 'exempt':
-                rec.status = 'ok'
-                rec.can_shop = True
 
     @api.depends('today', 'irregular_start_date', 'sr', 'holiday_start_time',
                  'holiday_end_time', 'temporary_exempt_start_date',
@@ -183,24 +105,10 @@ class CooperativeStatus(models.Model):
                         next_countdown_date = date
                 rec.next_countdown_date = next_countdown_date
 
-    @api.constrains("working_mode", "irregular_start_date")
-    def _constrains_irregular_start_date(self):
-        if self.working_mode == "irregular" and not self.irregular_start_date:
-            raise UserError(_("Irregular workers must have an irregular start date."))
 
-    def _next_countdown_date(self, irregular_start_date, today=False):
-        """
-        Return the next countdown date given irregular_start_date and
-        today dates.
-        This does not take holiday and other status into account.
-        """
-        today = today or fields.Date.today()
-
-        delta = (today - irregular_start_date).days
-        if not delta % PERIOD:
-            return today
-        return add_days_delta(today, PERIOD - (delta % PERIOD))
-
+    #####################################
+    #   Status Change implementation    #
+    #####################################
     def _set_regular_status(self, grace_delay, alert_delay):
         self.ensure_one()
         counter_unsubscribe = int(self.env['ir.config_parameter'].get_param('regular_counter_to_unsubscribe', -4))
@@ -208,41 +116,32 @@ class CooperativeStatus(models.Model):
         grace_delay = grace_delay + self.time_extension
 
         if (self.sr + self.sc) <= counter_unsubscribe or self.unsubscribed:
-            self.status = 'unsubscribed'
-            self.can_shop = False
+            return 'unsubscribed'
         #Check if exempted. Exempt end date is not required.
-        elif self.temporary_exempt_start_date and self.today >= self.temporary_exempt_start_date:
+        if self.temporary_exempt_start_date and self.today >= self.temporary_exempt_start_date:
             if not self.temporary_exempt_end_date or self.today <= self.temporary_exempt_end_date:
-                self.status = 'exempted'
-                self.can_shop = True
+                return 'exempted'
 
         #Transition to alert sr < 0 or stay in alert sr < 0 or sc < 0 and thus alert time is defined
-        elif not ok and self.alert_start_time and self.extension_start_time and self.today <= add_days_delta(self.extension_start_time, grace_delay):
-            self.status = 'extension'
-            self.can_shop = True
-        elif not ok and self.alert_start_time and self.extension_start_time and self.today > add_days_delta(self.extension_start_time, grace_delay):
-            self.status = 'suspended'
-            self.can_shop = False
-        elif not ok and self.alert_start_time and self.today > add_days_delta(self.alert_start_time, alert_delay):
-            self.status = 'suspended'
-            self.can_shop = False
-        elif (self.sr < 0) or (not ok and self.alert_start_time):
-            self.status = 'alert'
-            self.can_shop = True
+        if not ok and self.alert_start_time and self.extension_start_time and self.today <= add_days_delta(self.extension_start_time, grace_delay):
+            return 'extension'
+        if not ok and self.alert_start_time and self.extension_start_time and self.today > add_days_delta(self.extension_start_time, grace_delay):
+            return 'suspended'
+        if not ok and self.alert_start_time and self.today > add_days_delta(self.alert_start_time, alert_delay):
+            return 'suspended'
+        if (self.sr < 0) or (not ok and self.alert_start_time):
+            return 'alert'
 
-        #Check for holidays; Can be in holidays even in alert or other mode ?
-        elif (
+        if (
             self.holiday_start_time
             and self.holiday_end_time
             and self.today >= self.holiday_start_time
             and self.today <= self.holiday_end_time
         ):
 
-            self.status = 'holiday'
-            self.can_shop = False
+            return 'holiday'
         elif ok or (not self.alert_start_time and self.sr >= 0):
-            self.status = 'ok'
-            self.can_shop = True
+            return 'ok'
 
     def _set_irregular_status(self, grace_delay, alert_delay):
         counter_unsubscribe = int(self.env['ir.config_parameter'].get_param('irregular_counter_to_unsubscribe', -3))
@@ -250,59 +149,30 @@ class CooperativeStatus(models.Model):
         ok = self.sr >= 0
         grace_delay = grace_delay + self.time_extension
         if self.sr <= counter_unsubscribe or self.unsubscribed:
-            self.status = 'unsubscribed'
-            self.can_shop = False
+            return 'unsubscribed'
         #Check if exempted. Exempt end date is not required.
         elif self.temporary_exempt_start_date and self.today >= self.temporary_exempt_start_date:
             if not self.temporary_exempt_end_date or self.today <= self.temporary_exempt_end_date:
-                self.status = 'exempted'
-                self.can_shop = True
+                return 'exempted'
         #Transition to alert sr < 0 or stay in alert sr < 0 or sc < 0 and thus alert time is defined
         elif not ok and self.alert_start_time and self.extension_start_time and self.today <= add_days_delta(self.extension_start_time, grace_delay):
-            self.status = 'extension'
-            self.can_shop = True
+            return 'extension'
         elif not ok and self.alert_start_time and self.extension_start_time and self.today > add_days_delta(self.extension_start_time, grace_delay):
-            self.status = 'suspended'
-            self.can_shop = False
+            return 'suspended'
         elif not ok and self.alert_start_time and self.today > add_days_delta(self.alert_start_time, alert_delay):
-            self.status = 'suspended'
-            self.can_shop = False
+            return 'suspended'
         elif (self.sr < 0) or (not ok and self.alert_start_time):
-            self.status = 'alert'
-            self.can_shop = True
+            return 'alert'
 
-        #Check for holidays; Can be in holidays even in alert or other mode ?
         elif (
             self.holiday_start_time
             and self.holiday_end_time
             and self.today >= self.holiday_start_time
             and self.today <= self.holiday_end_time
         ):
-            self.status = 'holiday'
-            self.can_shop = False
+            return 'holiday'
         elif ok or (not self.alert_start_time and self.sr >= 0):
-            self.status = 'ok'
-            self.can_shop = True
-
-    @api.multi
-    def write(self, vals):
-        """
-            Overwrite write to historize the change
-        """
-        for field in ['sr', 'sc', 'time_extension', 'extension_start_time', 'alert_start_time', 'unsubscribed']:
-            if not field in vals:
-                continue
-            for rec in self:
-                data = {
-                        'status_id': rec.id,
-                        'cooperator_id': rec.cooperator_id.id,
-                        'type': 'counter',
-                        'user_id': self.env.context.get('real_uid', self.env.uid),
-                }
-                if vals.get(field, rec[field]) != rec[field]:
-                    data['change'] = '%s: %s -> %s' % (field.upper(), rec[field], vals.get(field))
-                    self.env['cooperative.status.history'].sudo().create(data)
-        return super(CooperativeStatus, self).write(vals)
+            return 'ok'
 
     def _state_change(self, new_state):
         self.ensure_one()
@@ -327,83 +197,62 @@ class CooperativeStatus(models.Model):
             )
 
     def _change_counter(self, data):
+        """
+            Call when a shift state is changed
+            use data generated by _get_counter_date_state_change
+        """
         self.sc += data.get('sc', 0)
         self.sr += data.get('sr', 0)
         self.irregular_absence_counter += data.get('irregular_absence_counter', 0)
         self.irregular_absence_date = data.get('irregular_absence_date', False)
 
-    @api.multi
-    def _write(self, vals):
-        """
-            Overwrite write to historize the change of status
-            and make action on status change
-        """
-        if 'status' in vals:
-            self._cr.execute('select id, status, sr, sc from "%s" where id in %%s' % self._table, (self._ids,))
-            result = self._cr.dictfetchall()
-            old_status_per_id = {r['id'] : r for r in result}
-            for rec in self:
-                if old_status_per_id[rec.id]['status'] != vals['status']:
-                    data = {
-                        'status_id': rec.id,
-                        'cooperator_id': rec.cooperator_id.id,
-                        'type': 'status',
-                        'change': "STATUS: %s -> %s" % (old_status_per_id[rec.id]['status'], vals['status']),
-                        'user_id': self.env.context.get('real_uid', self.env.uid),
-                    }
-                    self.env['cooperative.status.history'].sudo().create(data)
-                    rec._state_change(vals['status'])
-        return super(CooperativeStatus, self)._write(vals)
+    ###############################################
+    ###### Irregular Cron implementation ##########
+    ###############################################
 
-    _sql_constraints = [
-        ('cooperator_uniq', 'unique (cooperator_id)', _('You can only set one cooperator status per cooperator')),
-    ]
-
-    @api.model
-    def _set_today(self):
-        """
-            Method call by the cron to update store value base on the date
-        """
-        self.search([]).write({'today': fields.Date.today()})
-
-    @api.multi
-    def clear_history(self):
-        self.ensure_one()
-        self.history_ids.unlink()
-
-    @api.model
-    def _cron_compute_counter_irregular(self, today=False):
-        today = today or fields.Date.today()
-        journal = self.env['beesdoo.shift.journal'].search([('date', '=', today)])
-        if not journal:
-            journal = self.env['beesdoo.shift.journal'].create({'date': today})
-        domain = ['&',
-                                     '&',
-                                        '&', ('status', '!=', 'unsubscribed'),
-                                             ('working_mode', '=', 'irregular'),
-                                        ('irregular_start_date', '!=', False),
-                                     '|',
-                                        '|', ('holiday_start_time', '=', False), ('holiday_end_time', '=', False),
-                                        '|', ('holiday_start_time', '>', today), ('holiday_end_time', '<', today),
+    def _get_irregular_worker_domain(self):
+        return ['&',
+                    '&',
+                        '&', 
+                            ('status', 'not in', ['unsubscribed', 'exempted']),
+                            ('working_mode', '=', 'irregular'),
+                        ('irregular_start_date', '!=', False),
+                    '|',
+                        '|', ('holiday_start_time', '=', False), ('holiday_end_time', '=', False),
+                        '|', ('holiday_start_time', '>', today), ('holiday_end_time', '<', today),
         ]
-        irregular = self.search(domain)
-        for status in irregular:
-            if status.status == 'exempted':
-                continue
-            delta = (today - status.irregular_start_date).days
-            if delta and delta % PERIOD == 0 and status not in journal.line_ids:
-                if status.sr > 0:
-                    status.sr -= 1
-                elif status.alert_start_time:
-                    status.sr -= 1
-                else:
-                    status.sr -= 2
-                journal.line_ids |= status
+
+    def _change_irregular_counter(self):
+        if self.sr > 0:
+            self.sr -= 1
+        elif self.alert_start_time:
+            self.sr -= 1
+        else:
+            self.sr -= 2
+
+    ##################################
+    #    Internal Implementation     #
+    ##################################
+    def _next_countdown_date(self, irregular_start_date, today=False):
+        """
+        Return the next countdown date given irregular_start_date and
+        today dates.
+        This does not take holiday and other status into account.
+        """
+        today = today or fields.Date.today()
+
+        delta = (today - irregular_start_date).days
+        if not delta % PERIOD:
+            return today
+        return add_days_delta(today, PERIOD - (delta % PERIOD))
 
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-
+    """
+        Override is_worker definition
+        You need have subscribe to a A Share
+    """
     is_worker = fields.Boolean(compute="_is_worker", search="_search_worker")
 
     def _is_worker(self):
@@ -415,5 +264,3 @@ class ResPartner(models.Model):
             return [('cooperator_type', '=', 'share_a')]
         else:
             return [('cooperator_type', '!=', 'share_a')]
-    #TODO access right + vue on res.partner
-    #TODO can_shop : Status can_shop ou extempted ou part C
